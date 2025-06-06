@@ -570,7 +570,7 @@ jobs:
         git clone https://github.com/huggingface/optimum-executorch
         pushd optimum-executorch
         # There is no release yet, for CI stability, always test from the same commit on main
-        git checkout da80c9e35b3db5c7eea8731b7d660482fb4870a8
+        git checkout 1c653dc49812fc431a22312c7295d97005d22e12
         pip install .[tests]
         popd
 
@@ -588,7 +588,7 @@ jobs:
         echo "::group::Export to ExecuTorch"
         # Pass matrix variable as environment variable
         export MODEL_ID="${{ matrix.hf_model_id }}"
-        export OUTPUT_DIR="$(pwd)/${MODEL_ID}_custom_sdpa_8da4w"
+        export OUTPUT_DIR="$(pwd)/${MODEL_ID}_custom_sdpa_kv_cache_8da4w"
         pushd optimum-executorch
 
         optimum-cli export executorch \
@@ -596,8 +596,10 @@ jobs:
           --task text-generation \
           --recipe xnnpack \
           --use_custom_sdpa \
+          --use_custom_kv_cache \
+          --qlinear \
+          --qembedding \
           --output_dir ${OUTPUT_DIR} \
-          --qlinear
 
         ls -FlAGhp ${OUTPUT_DIR}
         popd
